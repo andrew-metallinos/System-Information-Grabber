@@ -1,4 +1,4 @@
-﻿ <#
+ <#
     .SYNOPSIS
 
         This function can be used to find the basic
@@ -58,7 +58,7 @@ Write-Host "
     Author: Andrew Metallinos <andrew@metallinostech.com.au>
     Creation Date: 24/04/2022
     Revision Date: 25/04/2022
-    Version: 1.1.0
+    Version: 1.1.1
 
 ========================================
 "
@@ -79,10 +79,10 @@ Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DriveType=3" |Measure-Obje
 Get-PSDrive -PSProvider FileSystem | format-table -property Root,@{n="Used (GB)";e={[math]::Round($_.Used/1GB,1)}},@{n="Free (GB)";e={[math]::Round($_.Free/1GB,1)}}
         "`n----------------------------------------`n"
 Write-Host "The BIOS details are below: `n"
-Get-ComputerInfo BiosManufacturer, BiosVersion
+Get-ComputerInfo BiosManufacturer, BiosVersion | format-list
         "`n----------------------------------------`n"
 Write-Host "The printer details are below: `n"
-get-WMIObject -Class Win32_Printer | format-table -property Location, Name, PrinterState, PrinterStatus
+get-WMIObject -Class Win32_Printer | format-list -property Location, Name, PrinterState, PrinterStatus
         "`n========================================`n"
 
 
@@ -108,8 +108,8 @@ Get-ComputerInfo OsName, OsArchitecture, OsBuildNumber, OsVersion, OsSerialNumbe
 Get-ComputerInfo CsTotalPhysicalMemory, CsModel, CsManufacturer, CsProcessors, CsNetworkAdapters | Out-File systeminfo3.txt -Encoding utf8
 Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DriveType=3" |Measure-Object -Property FreeSpace,Size -Sum |Select-Object -Property Property,Sum | Out-File systeminfo4.txt -Encoding utf8
 Get-PSDrive -PSProvider FileSystem | format-table -property Root,@{n="Used (GB)";e={[math]::Round($_.Used/1GB,1)}},@{n="Free (GB)";e={[math]::Round($_.Free/1GB,1)}} | Out-File systeminfo5.txt -Encoding utf8
-Get-ComputerInfo BiosManufacturer, BiosVersion | Out-File systeminfo6.txt -Encoding utf8
-get-WMIObject -Class Win32_Printer | format-table -property Location, Name, PrinterState, PrinterStatus | Out-File systeminfo7.txt -Encoding utf8
+Get-ComputerInfo BiosManufacturer, BiosVersion  | format-list | Out-File systeminfo6.txt -Encoding utf8
+get-WMIObject -Class Win32_Printer | format-list -property Location, Name, PrinterState, PrinterStatus | Out-File systeminfo7.txt -Encoding utf8
 
 Add-Content SystemInformationGrabber.txt -Value "System Information Grabber for the device: $env:computername
 
@@ -147,8 +147,8 @@ END OF FILE
 
 
 # Email output file
-$FROM = "youremail@gmail.com"
-$PASS = "youremailpassword"
+$FROM = "script.runner.aus@gmail.com"
+$PASS = "uncanny8daddy4chicago"
 $PC_NAME = "$env:computername"
 $SUBJECT = "System Information Grabber - " + $PC_NAME
 $BODY = "Hi there,
@@ -171,7 +171,7 @@ Send-MailMessage -SmtpServer "smtp.gmail.com" -Port 587 -From ${FROM} -to ${TO} 
 Read-Host -Prompt "
 ----------------------------------------
 
-Press Enter to close this window & to remove all tracks"
+The email has now been sent. Press Enter to close this window & to remove all tracks"
 
 
 
