@@ -83,7 +83,7 @@ Get-ComputerInfo BiosManufacturer, BiosVersion
         "`n----------------------------------------`n"
 Write-Host "The printer details are below: `n"
 get-WMIObject -Class Win32_Printer | format-table -property Location, Name, PrinterState, PrinterStatus
-        "`n========================================n"
+        "`n========================================`n"
 
 
 
@@ -171,7 +171,7 @@ Send-MailMessage -SmtpServer "smtp.gmail.com" -Port 587 -From ${FROM} -to ${TO} 
 Read-Host -Prompt "
 ----------------------------------------
 
-The email has now been sent. Press Enter to close this window & to remove all tracks"
+Press Enter to close this window & to remove all tracks"
 
 
 
