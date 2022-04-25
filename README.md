@@ -1,2 +1,5 @@
 # System-Information-Grabber
-PowerShell script to generate the basic details of the device it's used on. An email can then be sent with this information.
+
+This PowerShell script generates the basic details of the device it's used on and then from there an email can be sent with this information to the desired address.
+
+Please Note: Less Secure Apps needs tobe turned on for the Gmail account used for sending the .txt file out.
