@@ -171,7 +171,7 @@ Send-MailMessage -SmtpServer "smtp.gmail.com" -Port 587 -From ${FROM} -to ${TO} 
 Read-Host -Prompt "
 ----------------------------------------
 
-The email has now been sent. Press Enter to close this window & to remove all tracks"
+Press Enter to close this window & to remove all tracks"
 
 
 
