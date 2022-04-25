@@ -147,8 +147,8 @@ END OF FILE
 
 
 # Email output file
-$FROM = "script.runner.aus@gmail.com"
-$PASS = "uncanny8daddy4chicago"
+$FROM = "youremail@gmail.com"
+$PASS = "emailpassword"
 $PC_NAME = "$env:computername"
 $SUBJECT = "System Information Grabber - " + $PC_NAME
 $BODY = "Hi there,
