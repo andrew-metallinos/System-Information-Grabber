@@ -1,4 +1,4 @@
- <#
+﻿ <#
     .SYNOPSIS
 
         This function can be used to find the basic
