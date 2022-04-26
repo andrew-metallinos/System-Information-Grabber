@@ -58,7 +58,7 @@ Write-Host "
     Author: Andrew Metallinos <andrew@metallinostech.com.au>
     Creation Date: 24/04/2022
     Revision Date: 25/04/2022
-    Version: 1.4.0
+    Version: 1.4.1
 
 ========================================
 "
@@ -123,7 +123,8 @@ get-WMIObject -Class Win32_Printer | Format-Table -Property Name,
 "
 Write-Host "The details of all installed programs are below:
 "
-Get-WmiObject -Class Win32_Product | Format-Table -Property Name,
+Get-WmiObject -Class Win32_Product | Sort -Property Name |
+                                     Format-Table -Property Name,
                                                             Version,
                                                             Vendor
 "
@@ -195,6 +196,7 @@ Format-Table -Property Name,
                         Out-File systeminfo6.txt -Encoding utf8
 
 Get-WmiObject -Class Win32_Product |
+Sort -Property Name |
 Format-Table -Property Name,
                        Version,
                        Vendor |
@@ -202,7 +204,7 @@ Format-Table -Property Name,
 
 
 
-Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.4.0
+Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.4.1
 PC Name: $env:computername
 User's Name: $PC_USER
 
@@ -261,7 +263,7 @@ $FROM = "youremail@gmail.com"
 $PASS = "emailpassword"
 $PC_NAME = "$env:computername"
 
-$SUBJECT = "System Information Grabber v1.4.0 - " + $PC_NAME + " ($PC_USER)"
+$SUBJECT = "System Information Grabber v1.4.1 - " + $PC_NAME + " ($PC_USER)"
 $BODY = "Hi there,
 
 All system information for " + $PC_NAME + " ($PC_USER)" + " is attached as a .txt file to this email.
