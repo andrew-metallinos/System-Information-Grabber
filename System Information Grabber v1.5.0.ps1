@@ -58,7 +58,7 @@ Write-Host "
     Author: Andrew Metallinos <andrew@metallinostech.com.au>
     Creation Date: 24/04/2022
     Revision Date: 25/04/2022
-    Version: 1.4.1
+    Version: 1.5.0
 
 ========================================
 "
@@ -66,33 +66,33 @@ Write-Host "
 
 
 Write-Host "The users/domain/workgroup details are below:"
-Get-ComputerInfo WindowsRegisteredOwner,
-                 CsUserName,
-                 CsWorkgroup,
-                 CsDomain,
-                 KeyboardLayout,
-                 TimeZone,
-                 OsLocalDateTime
+Get-ComputerInfo | Format-List -Property @{n="Owner";e={$_.WindowsRegisteredOwner}},
+                                         @{n="Username";e={$_.CsUserName}},
+                                         @{n="Workgroup";e={$_.CsWorkgroup}},
+                                         @{n="Domain";e={$_.CsDomain}},
+                                         @{n="Keyboard Layout";e={$_.KeyboardLayout}},
+                                         @{n="Time-Zone";e={$_.TimeZone}},
+                                         @{n="Local Date/Time";e={$_.OsLocalDateTime}}
 "
 ----------------------------------------
 "
 Write-Host "The OS details are below:
 "
-Get-ComputerInfo OsName,
-                 OsArchitecture,
-                 OsBuildNumber,
-                 OsVersion,
-                 OsSerialNumber
+Get-ComputerInfo | Format-List -Property @{n="Name";e={$_.OsName}},
+                                         @{n="Architecture";e={$_.OsArchitecture}},
+                                         @{n="Build Number";e={$_.OsBuildNumber}},
+                                         @{n="Version";e={$_.OsVersion}},
+                                         @{n="Serial Number";e={$_.OsSerialNumber}}
 "
 ----------------------------------------
 "
 Write-Host "The CS details are below:
 "
-Get-ComputerInfo CsTotalPhysicalMemory,
-                 CsModel,
-                 CsManufacturer,
-                 CsProcessors,
-                 CsNetworkAdapters
+Get-ComputerInfo | Format-List -Property @{n="Memory (GB)";;e={[math]::Round($_.CsTotalPhysicalMemory/1GB,1)}},
+                                         @{n="Model";e={$_.CsModel}},
+                                         @{n="Manufacturer";e={$_.CsManufacturer}},
+                                         @{n="Processors";e={$_.CsProcessors}},
+                                         @{n="Network Adapters";e={$_.CsNetworkAdapters}}
 "
 ----------------------------------------
 "
@@ -107,26 +107,29 @@ Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DriveType=3" | Format-Tabl
 ----------------------------------------
 "
 Write-Host "The BIOS details are below: `n"
-Get-ComputerInfo BiosManufacturer, BiosVersion | Format-Table
+Get-ComputerInfo | Format-List -Property @{n="Manufacturer";e={$_.BiosManufacturer}},
+                                         @{n="Version";e={$_.BiosVersion}},
+                                         @{n="Frimware Type";e={$_.BiosFirmwareType}}
 
+Get-Tpm | Format-List -Property @{n="Is TPM Present?";e={$_.TpmPresent}},
+                                @{n="Is TPM Enabled?";e={$_.TpmEnabled}}
 "
 ----------------------------------------
 "
 Write-Host "The printer details are below:
 "
-get-WMIObject -Class Win32_Printer | Format-Table -Property Name,
-                                                            PrinterState,
-                                                            PrinterStatus,
-                                                            Location
+Get-WMIObject -Class Win32_Printer | Format-Table -Property @{n="Name";e={$_.Name}},
+                                                            @{n="State";e={$_.PrinterState}},
+                                                            @{n="Status";e={$_.PrinterStatus}},
+                                                            @{n="Location";e={$_.Location}}
 "
 ----------------------------------------
 "
 Write-Host "The details of all installed programs are below:
 "
-Get-WmiObject -Class Win32_Product | Sort -Property Name |
-                                     Format-Table -Property Name,
-                                                            Version,
-                                                            Vendor
+Get-WmiObject -Class Win32_Product | Sort -Property Name | Format-Table -Property Name,
+                                                                                  Version,
+                                                                                  Vendor
 "
 ========================================
 "
@@ -144,8 +147,7 @@ $TO = Read-Host -Prompt "Enter in an email address you would like to send
 all of the above information to and then press ENTER"
 "`n`n"
 # Who's PC is this?
-$PC_USER = Read-Host -Prompt "Enter in the name of the person who uses this PC and then press ENTER.
-If there is no user, simply write what you like to know this PC by so it's added to the report"
+$PC_USER = Read-Host -Prompt "Enter in a short description of who uses this PC or the purpose of this PC and then press ENTER"
 
 
 # All the files will be saved in this directory
@@ -153,58 +155,56 @@ $PATH = "C:\SystemInformationGrabber"
 mkdir $PATH
 cd $PATH
 
-Get-ComputerInfo WindowsRegisteredOwner,
-                 CsUserName,
-                 CsWorkgroup,
-                 CsDomain,
-                 KeyboardLayout,
-                 TimeZone,
-                 OsLocalDateTime |
-                        Out-File systeminfo1.txt -Encoding utf8
+Get-ComputerInfo | Format-List -Property @{n="Username";e={$_.CsUserName}},
+                                         @{n="Workgroup";e={$_.CsWorkgroup}},
+                                         @{n="Domain";e={$_.CsDomain}},
+                                         @{n="Keyboard Layout";e={$_.KeyboardLayout}},
+                                         @{n="Time-Zone";e={$_.TimeZone}},
+                                         @{n="Local Date/Time";e={$_.OsLocalDateTime}} |
+                                         Out-File systeminfo1.txt -Encoding utf8
 
-Get-ComputerInfo OsName,
-                 OsArchitecture,
-                 OsBuildNumber,
-                 OsVersion,
-                 OsSerialNumber |
-                        Out-File systeminfo2.txt -Encoding utf8
+Get-ComputerInfo | Format-List -Property @{n="Name";e={$_.OsName}},
+                                         @{n="Architecture";e={$_.OsArchitecture}},
+                                         @{n="Build Number";e={$_.OsBuildNumber}},
+                                         @{n="Version";e={$_.OsVersion}} |
+                                         Out-File systeminfo2.txt -Encoding utf8
 
-Get-ComputerInfo CsTotalPhysicalMemory,
-                 CsModel,
-                 CsManufacturer,
-                 CsProcessors,
-                 CsNetworkAdapters |
-                        Out-File systeminfo3.txt -Encoding utf8
+Get-ComputerInfo | Format-List -Property @{n="Memory (GB)";;e={[math]::Round($_.CsTotalPhysicalMemory/1GB,1)}},
+                                         @{n="Model";e={$_.CsModel}},
+                                         @{n="Manufacturer";e={$_.CsManufacturer}},
+                                         @{n="Processors";e={$_.CsProcessors}},
+                                         @{n="Network Adapters";e={$_.CsNetworkAdapters}} | 
+                                         Out-File systeminfo3.txt -Encoding utf8
 
-Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DriveType=3" |
-Format-Table -Property @{n="Drive";e={$_.DeviceID}},
-                       @{n="Volume Name";e={$_.VolumeName}},
-                       @{n="Size (GB)";e={[math]::Round($_.Size/1GB,1)}},
-                       @{n="Free (GB)";e={[math]::Round($_.FreeSpace/1GB,1)}}|
-                        Out-File systeminfo4.txt -Encoding utf8
+Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DriveType=3" | Format-Table -Property @{n="Drive";e={$_.DeviceID}},
+                                                                                            @{n="Volume Name";e={$_.VolumeName}},
+                                                                                            @{n="Size (GB)";e={[math]::Round($_.Size/1GB,1)}},
+                                                                                            @{n="Free (GB)";e={[math]::Round($_.FreeSpace/1GB,1)}} |
+                                                                                            Out-File systeminfo4.txt -Encoding utf8
 
-Get-ComputerInfo BiosManufacturer,
-                 BiosVersion |
-                 Format-List |
-                        Out-File systeminfo5.txt -Encoding utf8
+Get-ComputerInfo | Format-List -Property @{n="Manufacturer";e={$_.BiosManufacturer}},
+                                         @{n="Version";e={$_.BiosVersion}},
+                                         @{n="Frimware Type";e={$_.BiosFirmwareType}} |
+                                         Add-Content systeminfo5.txt -Encoding utf8
 
-Get-WMIObject -Class Win32_Printer |
-Format-Table -Property Name,
-                       PrinterState,
-                       PrinterStatus,
-                       Location |
-                        Out-File systeminfo6.txt -Encoding utf8
+Get-Tpm | Format-List -Property @{n="Is TPM Present?";e={$_.TpmPresent}},
+                                @{n="Is TPM Enabled?";e={$_.TpmEnabled}} |
+                                Add-Content systeminfo5.txt -Encoding utf8
 
-Get-WmiObject -Class Win32_Product |
-Sort -Property Name |
-Format-Table -Property Name,
-                       Version,
-                       Vendor |
-                        Out-File systeminfo7.txt -Encoding utf8
+Get-WMIObject -Class Win32_Printer | Format-Table -Property @{n="Name";e={$_.Name}},
+                                                            @{n="State";e={$_.PrinterState}},
+                                                            @{n="Status";e={$_.PrinterStatus}},
+                                                            @{n="Location";e={$_.Location}} |
+                                                            Out-File systeminfo6.txt -Encoding utf8
+
+Get-WmiObject -Class Win32_Product | Sort -Property Name | Format-Table -Property Name,
+                                                                                  Version,
+                                                                                  Vendor |
+                                                                                  Out-File systeminfo7.txt -Encoding utf8
 
 
 
-Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.4.1
+Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.5.0
 PC Name: $env:computername
 User's Name: $PC_USER
 
@@ -263,7 +263,7 @@ $FROM = "youremail@gmail.com"
 $PASS = "emailpassword"
 $PC_NAME = "$env:computername"
 
-$SUBJECT = "System Information Grabber v1.4.1 - " + $PC_NAME + " ($PC_USER)"
+$SUBJECT = "System Information Grabber v1.5.0 - " + $PC_NAME + " ($PC_USER)"
 $BODY = "Hi there,
 
 All system information for " + $PC_NAME + " ($PC_USER)" + " is attached as a .txt file to this email.
