@@ -58,7 +58,7 @@ Write-Host "
     Author: Andrew Metallinos <andrew@metallinostech.com.au>
     Creation Date: 24/04/2022
     Revision Date: 25/04/2022
-    Version: 1.5.0
+    Version: 1.5.1
 
 ========================================
 "
@@ -66,7 +66,7 @@ Write-Host "
 
 
 Write-Host "The users/domain/workgroup details are below:"
-Get-ComputerInfo | Format-List -Property @{n="Owner";e={$_.WindowsRegisteredOwner}},
+Get-ComputerInfo | Format-List -Property @{n="*Owner";e={$_.WindowsRegisteredOwner}},
                                          @{n="Username";e={$_.CsUserName}},
                                          @{n="Workgroup";e={$_.CsWorkgroup}},
                                          @{n="Domain";e={$_.CsDomain}},
@@ -82,7 +82,7 @@ Get-ComputerInfo | Format-List -Property @{n="Name";e={$_.OsName}},
                                          @{n="Architecture";e={$_.OsArchitecture}},
                                          @{n="Build Number";e={$_.OsBuildNumber}},
                                          @{n="Version";e={$_.OsVersion}},
-                                         @{n="Serial Number";e={$_.OsSerialNumber}}
+                                         @{n="*Serial Number";e={$_.OsSerialNumber}}
 "
 ----------------------------------------
 "
@@ -204,7 +204,7 @@ Get-WmiObject -Class Win32_Product | Sort -Property Name | Format-Table -Propert
 
 
 
-Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.5.0
+Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.5.1
 PC Name: $env:computername
 User's Name: $PC_USER
 
@@ -263,7 +263,7 @@ $FROM = "youremail@gmail.com"
 $PASS = "emailpassword"
 $PC_NAME = "$env:computername"
 
-$SUBJECT = "System Information Grabber v1.5.0 - " + $PC_NAME + " ($PC_USER)"
+$SUBJECT = "System Information Grabber v1.5.1 - " + $PC_NAME + " ($PC_USER)"
 $BODY = "Hi there,
 
 All system information for " + $PC_NAME + " ($PC_USER)" + " is attached as a .txt file to this email.
