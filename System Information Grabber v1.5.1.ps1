@@ -131,6 +131,18 @@ Get-WmiObject -Class Win32_Product | Sort -Property Name | Format-Table -Propert
                                                                                   Version,
                                                                                   Vendor
 "
+----------------------------------------
+"
+Write-Host "The details of the device's port number & IP Configuration is below: (this will not be sent tin the .txt file)
+"
+Get-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp\'-name portnumber |
+                         Format-List -Property @{n="Port Number";e={$_.PortNumber}}
+
+Get-NetIPConfiguration | Format-List -Property @{n="Alias";e={$_.InterfaceAlias}},
+                                               @{n="Description";e={$_.InterfaceDescription}},
+                                               @{n="Index";e={$_.InterfaceIndex}},
+                                               @{n="IPv4 Address";e={$_.IPv4Address}}
+"
 ========================================
 "
 
