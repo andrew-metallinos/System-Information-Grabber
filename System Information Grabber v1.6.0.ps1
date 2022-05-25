@@ -58,7 +58,7 @@ Write-Host "
     Author: Andrew Metallinos <andrew@metallinostech.com.au>
     Creation Date: 24/04/2022
     Revision Date: 25/04/2022
-    Version: 1.6.0
+    Version: 1.5.1
 
 ========================================
 "
@@ -275,7 +275,7 @@ $FROM = "youremail@gmail.com"
 $PASS = "emailpassword"
 $PC_NAME = "$env:computername"
 
-$SUBJECT = "System Information Grabber v1.6.0 - " + $PC_NAME + " ($PC_USER)"
+$SUBJECT = "System Information Grabber v1.5.1 - " + $PC_NAME + " ($PC_USER)"
 $BODY = "Hi there,
 
 All system information for " + $PC_NAME + " ($PC_USER)" + " is attached as a .txt file to this email.
