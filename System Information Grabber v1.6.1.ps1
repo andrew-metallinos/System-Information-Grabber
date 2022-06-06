@@ -6,6 +6,9 @@
         the information can be emailed to a desired
         address as a .txt attachment.
 
+        Some information will not be included in the
+        .txt file due to security concerns.
+
 
     .PARAMETERS
 
@@ -57,8 +60,8 @@ Write-Host "
     Title: System Information Grabber
     Author: Andrew Metallinos <andrew@metallinostech.com.au>
     Creation Date: 24/04/2022
-    Revision Date: 25/04/2022
-    Version: 1.5.1
+    Revision Date: 28/05/2022
+    Version: 1.6.1
 
 ========================================
 "
@@ -76,8 +79,7 @@ Get-ComputerInfo | Format-List -Property @{n="*Owner";e={$_.WindowsRegisteredOwn
 "
 ----------------------------------------
 "
-Write-Host "The OS details are below:
-"
+Write-Host "The OS details are below:"
 Get-ComputerInfo | Format-List -Property @{n="Name";e={$_.OsName}},
                                          @{n="Architecture";e={$_.OsArchitecture}},
                                          @{n="Build Number";e={$_.OsBuildNumber}},
@@ -86,8 +88,7 @@ Get-ComputerInfo | Format-List -Property @{n="Name";e={$_.OsName}},
 "
 ----------------------------------------
 "
-Write-Host "The CS details are below:
-"
+Write-Host "The CS details are below:"
 Get-ComputerInfo | Format-List -Property @{n="Memory (GB)";;e={[math]::Round($_.CsTotalPhysicalMemory/1GB,1)}},
                                          @{n="Model";e={$_.CsModel}},
                                          @{n="Manufacturer";e={$_.CsManufacturer}},
@@ -106,7 +107,7 @@ Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DriveType=3" | Format-Tabl
 "
 ----------------------------------------
 "
-Write-Host "The BIOS details are below: `n"
+Write-Host "The BIOS details are below:"
 Get-ComputerInfo | Format-List -Property @{n="Manufacturer";e={$_.BiosManufacturer}},
                                          @{n="Version";e={$_.BiosVersion}},
                                          @{n="Frimware Type";e={$_.BiosFirmwareType}}
@@ -133,8 +134,7 @@ Get-WmiObject -Class Win32_Product | Sort -Property Name | Format-Table -Propert
 "
 ----------------------------------------
 "
-Write-Host "The details of the device's port number & IP Configuration is below: (this will not be sent tin the .txt file)
-"
+Write-Host "The details of the device's port number & IP Configuration is below: (this will not be sent in the .txt file)"
 Get-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp\'-name portnumber |
                          Format-List -Property @{n="Port Number";e={$_.PortNumber}}
 
@@ -216,7 +216,7 @@ Get-WmiObject -Class Win32_Product | Sort -Property Name | Format-Table -Propert
 
 
 
-Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.5.1
+Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.6.1
 PC Name: $env:computername
 User's Name: $PC_USER
 
@@ -275,7 +275,7 @@ $FROM = "youremail@gmail.com"
 $PASS = "emailpassword"
 $PC_NAME = "$env:computername"
 
-$SUBJECT = "System Information Grabber v1.5.1 - " + $PC_NAME + " ($PC_USER)"
+$SUBJECT = "System Information Grabber v1.6.1 - " + $PC_NAME + " ($PC_USER)"
 $BODY = "Hi there,
 
 All system information for " + $PC_NAME + " ($PC_USER)" + " is attached as a .txt file to this email.
