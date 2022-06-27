@@ -55,11 +55,7 @@ Write-Host "
     Author: Andrew Metallinos <andrew@metallinostech.com.au>
     Creation Date: 24/04/2022
     Revision Date: 28/05/2022
-<<<<<<<< HEAD:System Information Grabber v1.7.0.ps1
     Version: 1.7.0
-========
-    Version: 1.6.1
->>>>>>>> abe8f8e3355f7b2c6689cf1d34252b783e3dee1f:System Information Grabber v1.6.1.ps1
 
 ========================================
 "
@@ -78,12 +74,8 @@ Get-ComputerInfo | Format-List -Property @{n="*Owner";e={$_.WindowsRegisteredOwn
 ----------------------------------------
 "
 Write-Host "The OS details are below:"
-<<<<<<<< HEAD:System Information Grabber v1.7.0.ps1
 Get-ComputerInfo | Format-List -Property @{n="Edition";e={$_.OsName}},
                                          @{n="Windows Version";e={$_.WindowsVersion}},
-========
-Get-ComputerInfo | Format-List -Property @{n="Name";e={$_.OsName}},
->>>>>>>> abe8f8e3355f7b2c6689cf1d34252b783e3dee1f:System Information Grabber v1.6.1.ps1
                                          @{n="Architecture";e={$_.OsArchitecture}},
                                          @{n="OS Build";e={$_.OsBuildNumber}},
                                          @{n="OS Version";e={$_.OsVersion}},
@@ -228,11 +220,7 @@ Get-WmiObject -Class Win32_Product | Sort -Property Name | Format-Table -Propert
 
 
 
-<<<<<<<< HEAD:System Information Grabber v1.7.0.ps1
 Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.7.0
-========
-Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.6.1
->>>>>>>> abe8f8e3355f7b2c6689cf1d34252b783e3dee1f:System Information Grabber v1.6.1.ps1
 PC Name: $env:computername
 User's Name: $PC_USER
 
@@ -291,18 +279,14 @@ END OF FILE
 
 
 # Email output file
-$FROM = "YOUR EMAIL ADDRESS"
-$PASS = "YOUR PASSWORD"
+$FROM = ""
+$PASS = ""
 $CRED = (New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ${FROM}, (ConvertTo-SecureString -String ${PASS} -AsPlainText -force))
 
-<<<<<<<< HEAD:System Information Grabber v1.7.0.ps1
-$SMTP_SERVER = "YOUR SMTP SERVER"
-$SMTP_PORT = "YOUR SMTP PORT"
+$SMTP_SERVER = ""
+$SMTP_PORT = ""
 
 $SUBJECT = "System Information Grabber v1.7.0 - " + $env:computername + " ($PC_USER)"
-========
-$SUBJECT = "System Information Grabber v1.6.1 - " + $PC_NAME + " ($PC_USER)"
->>>>>>>> abe8f8e3355f7b2c6689cf1d34252b783e3dee1f:System Information Grabber v1.6.1.ps1
 $BODY = "Hi there,
 
 All system information for " + $env:computername + " ($PC_USER)" + " is attached as a .txt file to this email.
