@@ -24,9 +24,6 @@
         $TO
             Recipient address.
 
-        $PC_NAME
-            Name of the device the script runs on.
-
         $SUBJECT
             Subject of the email.
 
@@ -35,7 +32,12 @@
 
         $ATTACH
             File name to attach to email.
-
+        
+        $SMTP_SERVER
+            SMTP server address.
+        
+        $SMTP_PORT
+            SMTP port number.
 #>
 
 
@@ -54,7 +56,7 @@ Write-Host "
     Title: System Information Grabber
     Author: Andrew Metallinos <andrew@metallinostech.com.au>
     Creation Date: 24/04/2022
-    Revision Date: 28/05/2022
+    Revision Date: 27/06/2022
     Version: 1.7.0
 
 ========================================
