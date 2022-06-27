@@ -6,6 +6,9 @@
         the information can be emailed to a desired
         address as a .txt attachment.
 
+        Some information will not be included in the
+        .txt file due to security concerns.
+
 
     .PARAMETERS
 
@@ -33,12 +36,6 @@
         $ATTACH
             File name to attach to email.
 
-
-    .NOTES
-
-        Ensure that Less Secure Apps has been turned
-        on for the email account being used to send
-        the .txt file.
 #>
 
 
@@ -57,8 +54,8 @@ Write-Host "
     Title: System Information Grabber
     Author: Andrew Metallinos <andrew@metallinostech.com.au>
     Creation Date: 24/04/2022
-    Revision Date: 25/04/2022
-    Version: 1.5.1
+    Revision Date: 28/05/2022
+    Version: 1.7.0
 
 ========================================
 "
@@ -76,18 +73,19 @@ Get-ComputerInfo | Format-List -Property @{n="*Owner";e={$_.WindowsRegisteredOwn
 "
 ----------------------------------------
 "
-Write-Host "The OS details are below:
-"
-Get-ComputerInfo | Format-List -Property @{n="Name";e={$_.OsName}},
+Write-Host "The OS details are below:"
+Get-ComputerInfo | Format-List -Property @{n="Edition";e={$_.OsName}},
+                                         @{n="Windows Version";e={$_.WindowsVersion}},
                                          @{n="Architecture";e={$_.OsArchitecture}},
-                                         @{n="Build Number";e={$_.OsBuildNumber}},
-                                         @{n="Version";e={$_.OsVersion}},
+                                         @{n="OS Build";e={$_.OsBuildNumber}},
+                                         @{n="OS Version";e={$_.OsVersion}},
                                          @{n="*Serial Number";e={$_.OsSerialNumber}}
+Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -Name DisplayVersion |
+                    Format-List -Property @{n="Display Version";e={$_.DisplayVersion}}
 "
 ----------------------------------------
 "
-Write-Host "The CS details are below:
-"
+Write-Host "The CS details are below:"
 Get-ComputerInfo | Format-List -Property @{n="Memory (GB)";;e={[math]::Round($_.CsTotalPhysicalMemory/1GB,1)}},
                                          @{n="Model";e={$_.CsModel}},
                                          @{n="Manufacturer";e={$_.CsManufacturer}},
@@ -106,10 +104,11 @@ Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DriveType=3" | Format-Tabl
 "
 ----------------------------------------
 "
-Write-Host "The BIOS details are below: `n"
+Write-Host "The BIOS details are below:"
 Get-ComputerInfo | Format-List -Property @{n="Manufacturer";e={$_.BiosManufacturer}},
                                          @{n="Version";e={$_.BiosVersion}},
-                                         @{n="Frimware Type";e={$_.BiosFirmwareType}}
+                                         @{n="Frimware Type";e={$_.BiosFirmwareType}},
+                                         @{n="Release Date";e={$_.BiosReleaseDate}}
 
 Get-Tpm | Format-List -Property @{n="Is TPM Present?";e={$_.TpmPresent}},
                                 @{n="Is TPM Enabled?";e={$_.TpmEnabled}}
@@ -131,6 +130,17 @@ Get-WmiObject -Class Win32_Product | Sort -Property Name | Format-Table -Propert
                                                                                   Version,
                                                                                   Vendor
 "
+----------------------------------------
+"
+Write-Host "The details of the device's port number & IP Configuration is below: (this will not be sent in the .txt file)"
+Get-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp\'-name portnumber |
+                         Format-List -Property @{n="Port Number";e={$_.PortNumber}}
+
+Get-NetIPConfiguration | Format-List -Property @{n="Alias";e={$_.InterfaceAlias}},
+                                               @{n="Description";e={$_.InterfaceDescription}},
+                                               @{n="Index";e={$_.InterfaceIndex}},
+                                               @{n="IPv4 Address";e={$_.IPv4Address}}
+"
 ========================================
 "
 
@@ -142,7 +152,7 @@ Get-WmiObject -Class Win32_Product | Sort -Property Name | Format-Table -Propert
 
 
 
-# Prompt to send email
+# Prompt to send email 
 $TO = Read-Host -Prompt "Enter in an email address you would like to send
 all of the above information to and then press ENTER"
 "`n`n"
@@ -163,11 +173,16 @@ Get-ComputerInfo | Format-List -Property @{n="Username";e={$_.CsUserName}},
                                          @{n="Local Date/Time";e={$_.OsLocalDateTime}} |
                                          Out-File systeminfo1.txt -Encoding utf8
 
-Get-ComputerInfo | Format-List -Property @{n="Name";e={$_.OsName}},
+Get-ComputerInfo | Format-List -Property @{n="Edition";e={$_.OsName}},
+                                         @{n="Windows Version";e={$_.WindowsVersion}},
                                          @{n="Architecture";e={$_.OsArchitecture}},
-                                         @{n="Build Number";e={$_.OsBuildNumber}},
-                                         @{n="Version";e={$_.OsVersion}} |
-                                         Out-File systeminfo2.txt -Encoding utf8
+                                         @{n="OS Build";e={$_.OsBuildNumber}},
+                                         @{n="OS Version";e={$_.OsVersion}} |
+                                         Out-File systeminfo2a.txt -Encoding utf8
+
+Get-ItemProperty -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -Name DisplayVersion |
+                   Format-List -Property @{n="Display Version";e={$_.DisplayVersion}} |
+                   Out-File systeminfo2b.txt -Encoding utf8
 
 Get-ComputerInfo | Format-List -Property @{n="Memory (GB)";;e={[math]::Round($_.CsTotalPhysicalMemory/1GB,1)}},
                                          @{n="Model";e={$_.CsModel}},
@@ -184,12 +199,13 @@ Get-CimInstance -ClassName Win32_LogicalDisk -Filter "DriveType=3" | Format-Tabl
 
 Get-ComputerInfo | Format-List -Property @{n="Manufacturer";e={$_.BiosManufacturer}},
                                          @{n="Version";e={$_.BiosVersion}},
-                                         @{n="Frimware Type";e={$_.BiosFirmwareType}} |
-                                         Add-Content systeminfo5.txt -Encoding utf8
+                                         @{n="Frimware Type";e={$_.BiosFirmwareType}},
+                                         @{n="Release Date";e={$_.BiosReleaseDate}} |
+                                         Out-File systeminfo5a.txt -Encoding utf8
 
 Get-Tpm | Format-List -Property @{n="Is TPM Present?";e={$_.TpmPresent}},
                                 @{n="Is TPM Enabled?";e={$_.TpmEnabled}} |
-                                Add-Content systeminfo5.txt -Encoding utf8
+                                Out-File systeminfo5b.txt -Encoding utf8
 
 Get-WMIObject -Class Win32_Printer | Format-Table -Property @{n="Name";e={$_.Name}},
                                                             @{n="State";e={$_.PrinterState}},
@@ -204,7 +220,7 @@ Get-WmiObject -Class Win32_Product | Sort -Property Name | Format-Table -Propert
 
 
 
-Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.5.1
+Add-Content SystemInformationGrabber.txt -Value "System Information Grabber v1.7.0
 PC Name: $env:computername
 User's Name: $PC_USER
 
@@ -219,7 +235,9 @@ Add-Content SystemInformationGrabber.txt
 Add-Content SystemInformationGrabber.txt -Value "----------------------------------------
 
 The OS details are below:"
-Get-Content systeminfo2.txt |
+Get-Content systeminfo2a.txt |
+Add-Content SystemInformationGrabber.txt
+Get-Content systeminfo2b.txt |
 Add-Content SystemInformationGrabber.txt
 
 Add-Content SystemInformationGrabber.txt -Value "----------------------------------------
@@ -237,7 +255,9 @@ Add-Content SystemInformationGrabber.txt
 Add-Content SystemInformationGrabber.txt -Value "----------------------------------------
 
 The BIOS details are below:"
-Get-Content systeminfo5.txt |
+Get-Content systeminfo5a.txt |
+Add-Content SystemInformationGrabber.txt
+Get-Content systeminfo5b.txt |
 Add-Content SystemInformationGrabber.txt
 
 Add-Content SystemInformationGrabber.txt -Value "----------------------------------------
@@ -259,19 +279,22 @@ END OF FILE
 
 
 # Email output file
-$FROM = "youremail@gmail.com"
-$PASS = "emailpassword"
-$PC_NAME = "$env:computername"
+$FROM = "YOUR EMAIL ADDRESS"
+$PASS = "YOUR PASSWORD"
+$CRED = (New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ${FROM}, (ConvertTo-SecureString -String ${PASS} -AsPlainText -force))
 
-$SUBJECT = "System Information Grabber v1.5.1 - " + $PC_NAME + " ($PC_USER)"
+$SMTP_SERVER = "YOUR SMTP SERVER"
+$SMTP_PORT = "YOUR SMTP PORT"
+
+$SUBJECT = "System Information Grabber v1.7.0 - " + $env:computername + " ($PC_USER)"
 $BODY = "Hi there,
 
-All system information for " + $PC_NAME + " ($PC_USER)" + " is attached as a .txt file to this email.
+All system information for " + $env:computername + " ($PC_USER)" + " is attached as a .txt file to this email.
 
 "
 $ATTACH = "SystemInformationGrabber.txt"
 
-Send-MailMessage -SmtpServer "smtp.gmail.com" -Port 587 -From ${FROM} -to ${TO} -Subject ${SUBJECT} -Body ${BODY} -Attachment ${ATTACH} -Priority High -UseSsl -Credential (New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList ${FROM}, (ConvertTo-SecureString -String ${PASS} -AsPlainText -force))
+Send-MailMessage -From ${FROM} -To ${TO} -Subject ${SUBJECT} -Body ${BODY} -Attachments ${ATTACH} -SmtpServer ${SMTP_SERVER} -Port ${SMTP_PORT} -Priority High -Credential ${CRED}
 
 
 
